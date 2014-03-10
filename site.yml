@@ -1,0 +1,22 @@
+
+- hosts: targets
+  gather_facts: false
+
+  tasks:
+    - name: create dirs
+      file: state=directory path=~/{{ item }}
+      with_items:
+        - public_html
+        - repos
+
+    - name: setup userdir
+      file: state=directory mode={{ item.mode }} path={{ item.path }}
+      with_items:
+        - { mode: 701, path: '~/' }
+        - { mode: 755, path: '~/public_html' }
+
+    - name: clone dotfiles
+      git: repo=ssh://git@github.com:gitetsu/dotfiles.git dest=~/repos/dotfiles update=no
+
+    - name: install linuxbrew
+      git: repo=git://github.com/Homebrew/linuxbrew.git dest=~/.linuxbrew
